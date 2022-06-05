@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cumt.forschool.mapper.RoleInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cumt.forschool.entity.RoleInfo">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_remark" property="roleRemark"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id, role_name, role_remark, deleted, create_time
+    </sql>
+
+    <select id="listRoleByUsername" parameterType="string" resultType="com.cumt.forschool.entity.RoleInfo">
+        SELECT
+            a.role_id, a.role_name, a.role_remark, a.deleted
+        FROM `role_info` a INNER JOIN `user_role_link` b ON a.role_id=b.role_id
+        WHERE
+            b.username = #{username} and a.deleted = 0
+    </select>
+
+</mapper>
