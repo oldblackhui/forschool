@@ -43,4 +43,6 @@ public class OrganizationInfo implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
+    @TableField(value = "role_name")
+    private String roleName;
 }

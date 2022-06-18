@@ -1,5 +1,7 @@
 package com.cumt.forschool.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cumt.forschool.DTO.ApplyDTO;
 import com.cumt.forschool.entity.ApplyForRent;
 import com.cumt.forschool.entity.MyUserDetail;
 import com.cumt.forschool.vo.DealApplyVO;
@@ -37,7 +39,19 @@ public class AuthController extends BaseController{
     public ResultVO getUserInfo(@RequestParam String username){
         return userInfoService.getUserInfo(username);
     }
+    @GetMapping("/auth/find/applyinfo")
+    public ResultVO findAllApplyInfoByUsername(@RequestParam String username,@RequestParam int current,@RequestParam int size) {
+        Page page = new Page(current,size);
+        List<ApplyDTO> applyDTOList = applyForRentService.listAllApplyInfoByUsername(username, page);
+        return ResultVO.ok(applyDTOList);
+    }
 
+    @GetMapping("/manager/find/applyinfo")
+    public ResultVO findAllApplyInfoForManager(@RequestParam int current,@RequestParam int size) {
+        Page page = new Page(current,size);
+        List<ApplyDTO> applyDTOList = applyForRentService.mangerOpsForRentByRole(page);
+        return ResultVO.ok(applyDTOList);
+    }
 
     @PostMapping("/refresh") // 刷新token
     public ResultVO refreshToken(HttpServletRequest request){
@@ -46,8 +60,9 @@ public class AuthController extends BaseController{
 
 
     @PostMapping("/auth/list/apply")
-    public List<ApplyForRent> listRoomApplyWithStatus(@RequestBody SimpleApplyVO simpleApplyVO){
-        return applyForRentService.listApplyForRentByIdAndStatus(simpleApplyVO.getId(), simpleApplyVO.getStatus());
+    public ResultVO listRoomApplyWithStatus(@RequestBody SimpleApplyVO simpleApplyVO){
+        List<ApplyForRent> applyForRents = applyForRentService.listApplyForRentByIdAndStatus(simpleApplyVO.getId(), simpleApplyVO.getStatus());
+        return ResultVO.ok(applyForRents);
     }
 
     @PostMapping("/auth/room/change")

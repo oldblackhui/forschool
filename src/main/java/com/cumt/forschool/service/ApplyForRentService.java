@@ -1,12 +1,11 @@
 package com.cumt.forschool.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cumt.forschool.DTO.DeviceInfoDTO;
+import com.cumt.forschool.DTO.ApplyDTO;
 import com.cumt.forschool.entity.ApplyForRent;
-import com.cumt.forschool.entity.DeviceInfo;
 import com.cumt.forschool.vo.ApplyUseVO;
 import com.cumt.forschool.vo.DealApplyVO;
-import com.cumt.forschool.vo.DeviceVO;
 import com.cumt.forschool.vo.ResultVO;
 
 import java.util.List;
@@ -16,6 +15,12 @@ import java.util.List;
  * @date: 2022/2/22 - 19:48
  */
 public interface ApplyForRentService extends IService<ApplyForRent> {
+
+    //根据拥有的权限查出所有未处理的操作的申请信息(管理员用)
+    public List<ApplyDTO> mangerOpsForRentByRole(Page page);
+
+    //通过学号查看所有的申请信息
+    public List<ApplyDTO> listAllApplyInfoByUsername(String username, Page page);
 
 
     /* 教室 设备 器材 公用*/

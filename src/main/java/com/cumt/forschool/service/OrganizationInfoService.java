@@ -15,7 +15,11 @@ import java.util.List;
 public interface OrganizationInfoService extends IService<OrganizationInfo> {
 
 
-    ResultVO selectAllOrganizations();
+    //对外展示的信息
+    List<OrganizationDTO> selectAllOrganizations();
+
+    //查询数据库中所有组织信息 程序内部使用
+    List<OrganizationInfo> selectAllOrganizationInfo();
 
     //添加一个组织
     ResultVO addOrganization(OrganizationVO organizationVO, String managerId);

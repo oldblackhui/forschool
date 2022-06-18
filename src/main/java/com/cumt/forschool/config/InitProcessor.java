@@ -3,6 +3,7 @@ package com.cumt.forschool.config;
 import com.cumt.forschool.bo.PermissionBo;
 import com.cumt.forschool.entity.RoomInfo;
 import com.cumt.forschool.service.PermissionInfoService;
+import com.cumt.forschool.service.RoleInfoService;
 import com.cumt.forschool.service.RoomInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class InitProcessor {
 
     @Autowired
     private RoomInfoService roomInfoService;
+
+    @Autowired
+    private RoleInfoService roleInfoService;
 
     @Autowired
     private RedisTemplate redisTemplate;

@@ -1,26 +1,24 @@
 package com.cumt.forschool.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cumt.forschool.DTO.DeviceInfoDTO;
+import com.cumt.forschool.DTO.ApplyDTO;
 import com.cumt.forschool.entity.*;
 import com.cumt.forschool.mapper.ApplyForRentMapper;
-import com.cumt.forschool.mapper.DeviceInfoMapper;
 import com.cumt.forschool.service.*;
 import com.cumt.forschool.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: ahui
@@ -43,7 +41,98 @@ public class ApplyForRentServiceImpl extends ServiceImpl<ApplyForRentMapper, App
     private DeviceUseService deviceUseService;
 
     @Autowired
+    private OrganizationInfoService organizationInfoService;
+
+    @Autowired
     private RedisTemplate redisTemplate;
+
+    @Override
+    public List<ApplyDTO> mangerOpsForRentByRole(Page page) {
+        Set members = redisTemplate.opsForSet().members(SecurityContextHolder.getContext().getAuthentication().getName() + ":role");
+        List<String> roles = new ArrayList<>();
+        for (Object s : members) {
+            roles.add(s.toString());
+        }
+        List<OrganizationInfo> organList = organizationInfoService.selectAllOrganizationInfo();
+        log.info("organList size "+organList.size());
+        log.info(" ==== "+organList.get(0));
+        List<String> organIds = new ArrayList<>();
+        HashMap<String,String> organIdAndName = new HashMap<>();
+        for (OrganizationInfo info : organList) {
+            log.info("organinfo:"+info.getRoleName());
+            log.info(""+roles.contains(info.getRoleName()));
+            if (roles.contains(info.getRoleName())){
+                organIds.add(info.getOrganizationId());
+                organIdAndName.put(info.getOrganizationId(),info.getOrganizationName());
+            }
+        }
+        log.info("组织id"+organIds);
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.select("apply_id","organization_id","username","using_id","using_kind","status","num","start_time","end_time","apply_info","apply_time");
+        wrapper.eq("deleted",0);
+        wrapper.in("organization_id",organIds);
+
+        wrapper.orderByDesc("status","apply_time");
+
+
+        IPage<ApplyForRent> iPage = baseMapper.selectPage(page, wrapper);
+        List<ApplyDTO> applyDTOList = new ArrayList<>();
+        for (ApplyForRent record : iPage.getRecords()) {
+            ApplyDTO applyDTO = new ApplyDTO();
+            applyDTO.setOrganizationName(organIdAndName.get(record.getOrganizationId()));
+            if (record.getUsingKind() == 1){
+                applyDTO.setKind("教室");
+                applyDTO.setRentName(roomInfoService.getById(record.getUsingId()).getRoomName());
+            }
+            if (record.getUsingKind() == 2){
+                applyDTO.setKind("设备");
+                applyDTO.setRentName(deviceInfoService.getById(record.getUsingId()).getDevicename());
+            }
+            applyDTO.setNum(record.getNum());
+            applyDTO.setApplyInfo(record.getApplyInfo());
+            applyDTO.setApplyTime(record.getApplyTime());
+            applyDTO.setStatus(record.getStatus());
+            applyDTO.setApplyInfo(record.getApplyInfo());
+            applyDTO.setStartTime(record.getStartTime());
+            applyDTO.setEndTime(record.getEndTime());
+            applyDTOList.add(applyDTO);
+        }
+        return applyDTOList;
+    }
+
+
+    @Override
+    public List<ApplyDTO> listAllApplyInfoByUsername(String username, Page page) {
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.eq("username",username);
+        wrapper.eq("deleted",0);
+
+        wrapper.select("organization_id","using_id","using_kind","status","num","start_time","end_time","apply_info","apply_time");
+        wrapper.orderByDesc("apply_time");
+        IPage<ApplyForRent> iPage = baseMapper.selectPage(page, wrapper);
+        List<ApplyDTO> applyDTOList = new ArrayList<>();
+        for (ApplyForRent record : iPage.getRecords()) {
+            ApplyDTO applyDTO = new ApplyDTO();
+            applyDTO.setOrganizationName(organizationInfoService.selectOrganizationById(record.getOrganizationId()).getOrganizationName());
+            if(record.getUsingKind() == 1) { // 教室
+                applyDTO.setKind("教室");
+                applyDTO.setRentName(roomInfoService.getById(record.getUsingId()).getRoomName());
+            }else if(record.getUsingKind() == 2) { // 设备
+                applyDTO.setKind("设备");
+                applyDTO.setRentName(deviceInfoService.getById(record.getUsingId()).getDevicename());
+            }
+            applyDTO.setNum(record.getNum());
+            applyDTO.setStatus(record.getStatus());
+            applyDTO.setApplyInfo(record.getApplyInfo());
+            applyDTO.setApplyTime(record.getApplyTime());
+            applyDTO.setStartTime(record.getStartTime());
+            applyDTO.setEndTime(record.getEndTime());
+            applyDTOList.add(applyDTO);
+        }
+
+
+        return applyDTOList;
+    }
 
     @Override
     public int addOneApplyRecord(ApplyForRent applyForRent) {

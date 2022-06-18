@@ -8,6 +8,7 @@ import com.cumt.forschool.mapper.OrganizationInfoMapper;
 import com.cumt.forschool.service.OrganizationInfoService;
 import com.cumt.forschool.vo.OrganizationVO;
 import com.cumt.forschool.vo.ResultVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,12 @@ import java.util.List;
  * @date: 2022/2/14 - 23:27
  */
 @Service
+@Slf4j
 public class OrganizationInfoServiceImpl extends ServiceImpl<OrganizationInfoMapper, OrganizationInfo> implements OrganizationInfoService {
 
 
     @Override
-    public ResultVO selectAllOrganizations() {
+    public List<OrganizationDTO> selectAllOrganizations() {
         QueryWrapper<OrganizationInfo> wrapper = new QueryWrapper<>();
         wrapper.select("organization_id","organization_name","leader","phone","introduction","location")
                 .eq("deleted",0);
@@ -40,7 +42,17 @@ public class OrganizationInfoServiceImpl extends ServiceImpl<OrganizationInfoMap
             organizationDTO.setIntroduction(organizationInfo.getIntroduction());
             list.add(organizationDTO);
         }
-        return ResultVO.ok(list);
+        return list;
+    }
+
+    @Override
+    public List<OrganizationInfo> selectAllOrganizationInfo() {
+        QueryWrapper<OrganizationInfo> wrapper = new QueryWrapper<>();
+        wrapper.select("organization_id","organization_name","leader","phone","introduction","location","role_name")
+                .eq("deleted",0);
+        List<OrganizationInfo> organizationInfos = baseMapper.selectList(wrapper);
+        log.info("组织全部信息"+organizationInfos);
+        return organizationInfos;
     }
 
     @Override
