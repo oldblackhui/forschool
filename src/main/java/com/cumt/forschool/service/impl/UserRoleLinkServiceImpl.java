@@ -35,6 +35,14 @@ public class UserRoleLinkServiceImpl extends ServiceImpl<UserRoleLinkMapper, Use
         if (user == null || role == null){
             return ResultVO.fail("请输入正确的学号或id");
         }
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.eq("username",username);
+        wrapper.eq("role_id",roleId);
+        wrapper.eq("deleted",0);
+        UserRoleLink res = baseMapper.selectOne(wrapper);
+        if (res != null){
+            return ResultVO.fail("请勿重复插入");
+        }
         UserRoleLink userRoleLink = new UserRoleLink();
 
         userRoleLink.setRoleId(roleId);

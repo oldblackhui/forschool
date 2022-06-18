@@ -20,8 +20,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class UserRoleLink implements Serializable {
-    @TableId(value = "user_id",type = IdType.AUTO)
-    private String userId;
+    @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     private String username;
     private Integer roleId;
