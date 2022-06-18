@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cumt.forschool.DTO.ApplyDTO;
 import com.cumt.forschool.entity.ApplyForRent;
 import com.cumt.forschool.entity.MyUserDetail;
-import com.cumt.forschool.vo.DealApplyVO;
-import com.cumt.forschool.vo.SimpleApplyVO;
-import com.cumt.forschool.vo.LoginVO;
-import com.cumt.forschool.vo.ResultVO;
+import com.cumt.forschool.entity.RoleInfo;
+import com.cumt.forschool.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +73,17 @@ public class AuthController extends BaseController{
         return applyForRentService.changeDeviceApplyStatus(dealApplyVO);
     }
 
+    @GetMapping("/admin/find/allrole")
+    public ResultVO listAllRoleInfo(){
+        List<RoleInfo> roleInfos = roleInfoService.listALLRoleInfo();
+        return ResultVO.ok(roleInfos);
+    }
+
+    @PostMapping("/admin/add/userrole")
+    public ResultVO addUserRoleLink(@RequestBody UserRoleIDVO userRoleIDVO){
+        ResultVO resultVO = userRoleLinkService.addUserRoleLink(userRoleIDVO.getUsername(), userRoleIDVO.getRoleId());
+        return resultVO;
+    }
 
     @GetMapping("/api/anon")
     public ResultVO test01() {

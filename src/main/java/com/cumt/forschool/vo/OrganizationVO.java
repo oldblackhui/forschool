@@ -13,4 +13,5 @@ public class OrganizationVO {
     private String phone;
     private String introduction;
     private String location;
+    private String roleName;
 }

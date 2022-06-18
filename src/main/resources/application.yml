@@ -21,13 +21,13 @@ spring:
     # 配置数据库连接
     url: jdbc:mysql://1.13.5.80:3306/schoolmanager?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   redis:
     host: 1.13.5.80
     port: 6379
-    password: txh1814489634
+    password:
     database: 3
     timeout: 180000
     jedis:

@@ -4,6 +4,7 @@ package com.cumt.forschool.controller;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cumt.forschool.entity.MyUserDetail;
+import com.cumt.forschool.entity.UserRoleLink;
 import com.cumt.forschool.exception.ApiException;
 import com.cumt.forschool.service.*;
 import com.cumt.forschool.utils.JWTokenUtil;
@@ -50,6 +51,12 @@ public class BaseController {
 
     @Autowired
     ApplyForRentService applyForRentService;
+
+    @Autowired
+    RoleInfoService roleInfoService;
+
+    @Autowired
+    UserRoleLinkService userRoleLinkService;
 
 
     protected String getLoginUser(){

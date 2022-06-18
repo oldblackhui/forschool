@@ -1,17 +1,23 @@
 package com.cumt.forschool.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cumt.forschool.DTO.OrganizationDTO;
 import com.cumt.forschool.entity.OrganizationInfo;
+import com.cumt.forschool.exception.ApiException;
 import com.cumt.forschool.mapper.OrganizationInfoMapper;
 import com.cumt.forschool.service.OrganizationInfoService;
+import com.cumt.forschool.service.RoleInfoService;
 import com.cumt.forschool.vo.OrganizationVO;
 import com.cumt.forschool.vo.ResultVO;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +29,10 @@ import java.util.List;
 @Service
 @Slf4j
 public class OrganizationInfoServiceImpl extends ServiceImpl<OrganizationInfoMapper, OrganizationInfo> implements OrganizationInfoService {
+
+
+    @Autowired
+    RoleInfoService roleInfoService;
 
 
     @Override
@@ -55,8 +65,19 @@ public class OrganizationInfoServiceImpl extends ServiceImpl<OrganizationInfoMap
         return organizationInfos;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ResultVO addOrganization(OrganizationVO organizationVO, String managerId) {
+
+        if (StringUtil.isNullOrEmpty(organizationVO.getRoleName())){
+            return ResultVO.fail("请输入组织的role");
+        }
+
+        int i = roleInfoService.addRoleAboutOrgan(organizationVO.getRoleName());
+        if ( i == 0){
+            throw new ApiException("role创建失败 请检查参数");
+        }
+
         OrganizationInfo organizationInfo = new OrganizationInfo();
         organizationInfo.setManagerId(managerId);
         organizationInfo.setOrganizationName(organizationVO.getOrganizationName());
@@ -70,10 +91,10 @@ public class OrganizationInfoServiceImpl extends ServiceImpl<OrganizationInfoMap
         int insert = baseMapper.insert(organizationInfo);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
-        if (insert == 1){
-            return ResultVO.ok(name+"创建"+organizationInfo.getOrganizationName()+"成功!");
+        if (insert == 0){
+            throw new ApiException("创建组织失败");
         }
-        return ResultVO.fail("创建失败,请检查参数或者权限");
+        return ResultVO.ok(name+"创建"+organizationInfo.getOrganizationName()+"成功!");
     }
 
 

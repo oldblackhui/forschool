@@ -1,5 +1,6 @@
 package com.cumt.forschool.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -24,14 +25,14 @@ public class RoleInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "role_id")
-    private String roleId;
+    @TableId(value = "role_id",type = IdType.AUTO)
+    private int roleId;
 
     @TableField(value = "role_name")
     private String roleName;
 
     @TableField(value = "role_mark")
-    private String roleRemark;
+    private String roleMark;
 
     private Integer deleted;
 

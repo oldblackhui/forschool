@@ -15,5 +15,13 @@ public interface RoleInfoService extends IService<RoleInfo> {
     //根据学号查询出所有的权限信息
     List<RoleInfo> listRoleByUsername(String username);
 
+    // 创建组织时候添加一个管理员信息
+    int addRoleAboutOrgan(String roleName);
+
+    //查询出所有role信息
+    List<RoleInfo> listALLRoleInfo();
+
+    // 为指定学号添加指定role
+    int addRoleByUsername(String username);
 
 }
